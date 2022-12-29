@@ -18,13 +18,17 @@
         flex-direction: column;
         height: 100%;
       }
-      #output {
+      .output {
         background: #222;
         color: #9b9baf;
         flex: 1;
+        font-family: monospace;
+        font-size: 1rem;
+        padding: 1em;
+        white-space: pre;
       }
-      #input,
-      #enter {
+      .input,
+      #form input[type="submit"] {
         margin: 0.25em 0;
         padding: 0.5em;
       }
@@ -33,9 +37,9 @@
 
   <body>
     <form id="form">
-      <textarea id="output" readonly></textarea>
-      <input type="text" id="input" autofocus />
-      <button id="enter">Enter</button>
+      <div class="output"></div>
+      <input type="text" class="input" autofocus />
+      <input type="submit" value="Enter" />
     </form>
     <script type="module" src="./main.ts"></script>
   </body>
