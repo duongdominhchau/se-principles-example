@@ -6,6 +6,7 @@ class Console {
   private resolveConsoleReadLine: PromiseResolve | null = null;
   private inputElement: HTMLInputElement;
   private outputElement: HTMLElement;
+  private submitButton: HTMLElement;
 
   constructor(containerForm: HTMLElement) {
     const inputElement = containerForm.querySelector(".input");
@@ -18,6 +19,11 @@ class Console {
       throw new Error("Unexpected HTML structure. Must have an element to display output");
     }
     this.outputElement = outputElement;
+    const submitButton = containerForm.querySelector('input[type="submit"]');
+    if (!(submitButton instanceof HTMLInputElement) || submitButton.type.toLowerCase() !== "submit") {
+      throw new Error("Unexpected HTML structure. Must have a submit button");
+    }
+    this.submitButton = submitButton;
     this.outputElement.textContent = "";
     containerForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -33,6 +39,11 @@ class Console {
   clear(): void {
     this.outputElement.textContent = "";
     this.output = [];
+  }
+
+  stopReceivingInput(): void {
+    this.inputElement.remove();
+    this.submitButton.remove();
   }
 
   async readLine(): Promise<string> {
@@ -56,7 +67,6 @@ class Console {
   private renderConsole(): void {
     this.outputElement.textContent = this.output.join("\n");
     this.outputElement.scrollTo({
-      behavior: "smooth",
       top: this.outputElement.scrollHeight,
     });
   }

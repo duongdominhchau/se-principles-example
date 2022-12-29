@@ -14,13 +14,18 @@ class App {
     this.console = new Console(form);
   }
 
+  private async promptForAction(): Promise<string> {
+    this.console.writeLine("What do you want to do?");
+    this.console.writeLine("1. Add a new contact");
+    this.console.writeLine("2. Lookup contact");
+    this.console.writeLine("3. Exit");
+    // Immediately await to ensure there is no other text printed
+    return await this.console.readLine();
+  }
+
   async run(): Promise<void> {
     while (true) {
-      this.console.writeLine("What do you want to do?");
-      this.console.writeLine("1. Add a new contact");
-      this.console.writeLine("2. Lookup contact");
-      this.console.writeLine("3. Exit");
-      const choice = await this.console.readLine();
+      const choice = await this.promptForAction();
       switch (choice) {
         case "1":
           await this.addContact();
@@ -38,6 +43,7 @@ class App {
       this.console.writeLine("");
     }
   }
+
   private async addContact(): Promise<void> {
     this.console.writeLine("Enter contact type (Person/Organization):");
     const type = await this.console.readLine();
@@ -59,8 +65,7 @@ class App {
 
   private quit(): void {
     this.console.writeLine("Bye!");
-    document.querySelector(".input")!.remove();
-    document.querySelector(".enter")!.remove();
+    this.console.stopReceivingInput();
   }
 
   private clearScreen(): void {
