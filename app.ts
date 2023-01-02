@@ -5,6 +5,30 @@ import { Person } from "./person";
 class App {
   public console: Console;
   private contacts: (Person | Organization)[] = [];
+  private stopped = false;
+
+  private static readonly COMMANDS = [
+    {
+      name: "add",
+      description: "Add a new contact",
+      action: App.prototype.addContact,
+    },
+    {
+      name: "search",
+      description: "Lookup contact",
+      action: App.prototype.searchContacts,
+    },
+    {
+      name: "clear",
+      description: "Clear screen",
+      action: App.prototype.clearScreen,
+    },
+    {
+      name: "quit",
+      description: "Quit",
+      action: App.prototype.quit,
+    },
+  ];
 
   constructor() {
     const form: HTMLElement | null = document.querySelector("#form");
@@ -16,31 +40,21 @@ class App {
 
   private async promptForAction(): Promise<string> {
     this.console.writeLine("What do you want to do?");
-    this.console.writeLine("1. Add a new contact");
-    this.console.writeLine("2. Lookup contact");
-    this.console.writeLine("3. Exit");
+    App.COMMANDS.forEach((command) => {
+      this.console.writeLine(`(${command.name}) ${command.description}`);
+    });
     // Immediately await to ensure there is no other text printed
     return await this.console.readLine();
   }
 
   async run(): Promise<void> {
-    while (true) {
-      const choice = await this.promptForAction();
-      switch (choice) {
-        case "1":
-          await this.addContact();
-          break;
-        case "2":
-          await this.searchContacts();
-          break;
-        case "3":
-          this.quit();
-          return;
-        case "clear":
-          this.clearScreen();
-          continue;
-      }
+    while (!this.stopped) {
       this.console.writeLine("");
+      const choice = await this.promptForAction();
+      const command = App.COMMANDS.find((command) => command.name === choice);
+      if (command !== undefined) {
+        await command.action.call(this);
+      }
     }
   }
 
@@ -66,6 +80,7 @@ class App {
   private quit(): void {
     this.console.writeLine("Bye!");
     this.console.stopReceivingInput();
+    this.stopped = true;
   }
 
   private clearScreen(): void {
